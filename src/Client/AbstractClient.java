@@ -6,11 +6,13 @@ import java.util.UUID;
 
 public abstract class AbstractClient implements IClient {
   public String generateRequestFromUserChoice(BufferedReader userInput) throws IOException {
-    System.out.println("Which operation do you want to use?");
-    System.out.println("1. PUT");
-    System.out.println("2. GET");
-    System.out.println("3. DELETE");
-    System.out.print("Enter your choice (1/2/3): ");
+    System.out.println("Specify operation:");
+    System.out.println("Input [1] -> PUT");
+    System.out.println("Input [2] -> GET");
+    System.out.println("Input [3] -> GET ALL");
+    System.out.println("Input [4] -> DELETE");
+    System.out.println("Input [5] -> DELETE ALL");
+    System.out.print("Enter your choice: ");
 
     String choice = userInput.readLine();
 
@@ -23,10 +25,16 @@ public abstract class AbstractClient implements IClient {
         request = generateGetRequest(userInput);
         break;
       case "3":
+        request = generateGetAllRequest();
+        break;
+      case "4":
         request = generateDeleteRequest(userInput);
         break;
+      case "5":
+        request = generateDeleteAllRequest();
+        break;
       default:
-        System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+        System.out.println("Invalid choice. Please enter 1, 2, 3, 4, or 5.");
     }
     return request;
   }
@@ -36,6 +44,16 @@ public abstract class AbstractClient implements IClient {
     String key = userInput.readLine();
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "GET" + "::" + key;
+  }
+
+  private String generateGetAllRequest() throws IOException {
+    String requestId = UUID.randomUUID().toString();
+    return requestId + "::" + "GET ALL";
+  }
+
+  private String generateDeleteAllRequest() throws IOException {
+    String requestId = UUID.randomUUID().toString();
+    return requestId + "::" + "DELETE ALL";
   }
 
   private String generatePutRequest(BufferedReader userInput) throws IOException {

@@ -1,13 +1,7 @@
 package Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
+import java.io.*;
 import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -32,7 +26,7 @@ public class UDPClient extends AbstractClient {
 
         System.out.print("Do you want to perform another operation? (yes/no): ");
         String anotherOperation = userInput.readLine().toLowerCase();
-        if (!anotherOperation.equals("yes")) {
+        if (!anotherOperation.equalsIgnoreCase("yes")) {
           break;
         }
       }
@@ -47,20 +41,32 @@ public class UDPClient extends AbstractClient {
     }
   }
 
-  private static String generateUUID() {
+  private String generateUUID() {
     UUID uuid = UUID.randomUUID();
     return uuid.toString();
   }
 
-  private static long generateChecksum(String requestString) {
+  private long generateChecksum(String requestString) {
     byte [] m = requestString.getBytes();
     Checksum crc32 = new CRC32();
     crc32.update(m, 0, m.length);
     return crc32.getValue();
   }
 
-  private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
-      int serverPort) throws IOException {
+  private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId) {
+    String resp = handleResponse(aSocket, reply, requestId);
+    int numKvs = Integer.parseInt(resp.split(":")[1]);
+    while(numKvs > 1) {
+      String response = handleResponse(aSocket, reply, requestId);
+      if(response.equals("TRANSFER COMPLETE!")) {
+        break;
+      }
+      numKvs--;
+    }
+  }
+
+  private void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
+    int serverPort) throws IOException {
 
     // Parse request information from the request string.
     String[] requestToken = requestString.split("::");
@@ -81,10 +87,24 @@ public class UDPClient extends AbstractClient {
     byte[] buffer = new byte[1000];
     DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 
+    if(action.equalsIgnoreCase("GET ALL")) {
+      handleLargeResponses(aSocket, reply, requestId);
+    } else {
+      handleResponse(aSocket, reply, requestId);
+    }
+    System.out.println("DONE!");
+  }
+
+  private String handleResponse(DatagramSocket aSocket, DatagramPacket reply, long requestId) {
     try {
       // receive response
       aSocket.receive(reply);
+
       String response = new String(reply.getData(), 0, reply.getLength());
+      if(response.equals("END")) {
+        return "TRANSFER COMPLETE!";
+      }
+
       String[] responseToken = response.split(":");
       long responseRequestId = Long.parseLong(responseToken[0]);
 
@@ -94,19 +114,23 @@ public class UDPClient extends AbstractClient {
           " ; Received response for " + responseToken[0]);
       } else {
         ClientLogger.log("Received response " + response);
-        System.out.println(action+" Reply: " + new String(reply.getData(), 0, reply.getLength()));
+        System.out.println(" Reply: " + new String(reply.getData(), 0, reply.getLength()));
       }
+      return response;
     } catch(SocketTimeoutException e) {
       System.out.println("Request timed out.. received no response from server for request: "
         + requestId);
       ClientLogger.log("Request timed out.. received no response from server for request: "
-          + requestId);
+        + requestId);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return "-1";
   }
 
-  private static void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
+  private void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
     throws IOException {
-    final int NUM_KEYS = 10;
+    final int NUM_KEYS = 45000;
     //Pre-populating key value store
     // Send PUT requests
     for (int i = 1; i <= NUM_KEYS * 2; i++) {
@@ -121,7 +145,7 @@ public class UDPClient extends AbstractClient {
     }
 
     //DELETE requests
-    for (int i = 5; i <= NUM_KEYS*2; i++) {
+    for (int i = 5; i <= 10; i++) {
       String getString = generateUUID() + "::DELETE::key" + i;
       sendRequest(aSocket, getString, aHost, serverPort);
     }

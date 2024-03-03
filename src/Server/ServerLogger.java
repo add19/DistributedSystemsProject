@@ -17,11 +17,12 @@ public class ServerLogger {
      * This function writes the server messages to the LOG_FILE.
      * @param message the log information to be written.
      */
-    public void log(String message) {
+    public void logServerMessage(String message) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-            writer.println(timeStamp + " - " + message);
+            writer.println("[" + timeStamp + "]=> " + message);
         } catch (IOException e) {
+            System.err.println("Error writing to log file: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -31,11 +32,12 @@ public class ServerLogger {
      * @param clientAddress The origin of request passed to server.
      * @param request Request information to be written to logs.
      */
-    public void logRequest(InetAddress clientAddress, String request) {
+    public void logClientRequest(InetAddress clientAddress, String request) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-            writer.println(timeStamp + " - Request from : " + clientAddress + ": " + request);
+            writer.println("Request originating from [" + clientAddress + "] @ [" + timeStamp + "]=> " + request);
         } catch (IOException e) {
+            System.err.println("Error writing to log file: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -45,11 +47,12 @@ public class ServerLogger {
      * @param clientAddress the address information to which the response is being sent.
      * @param response the actual response string sent to client.
      */
-    public void logResponse(InetAddress clientAddress, String response) {
+    public void logServerResponse(InetAddress clientAddress, String response) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-            writer.println(timeStamp + " - Response to : " + clientAddress + ": " + response);
+            writer.println("Response originating for [" + clientAddress + "] @ [" + timeStamp + "]=> " + response);
         } catch (IOException e) {
+            System.err.println("Error writing to log file: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -59,11 +62,12 @@ public class ServerLogger {
      * @param clientAddress The origin of malformed datagram request passed to server.
      * @param packetLength Length of the malformed datagram packet.
      */
-    public void logMalformedRequest(InetAddress clientAddress, int packetLength) {
+    public void logUDPMalformedRequest(InetAddress clientAddress, int packetLength) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-            writer.println(timeStamp + " - Received Malformed request from " + clientAddress + " of length " + packetLength);
+            writer.println("Malformed Response from [" + clientAddress + "] @ [" + timeStamp + "]=> length " + packetLength);
         } catch (IOException e) {
+            System.err.println("Error writing to log file: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -72,10 +76,10 @@ public class ServerLogger {
      * This logs all the malformed requests; specifically for TCP servers.
      * @param clientAddress The origin of malformed request passed to server.
      */
-    public void logMalformedRequest(InetAddress clientAddress) {
+    public void logTCPMalformedRequest(InetAddress clientAddress) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(LOG_FILE, true))) {
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-            writer.println(timeStamp + " - Received Malformed request from " + clientAddress);
+            writer.println("Malformed Response from [" + clientAddress + "] @ [" + timeStamp + "]");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -52,25 +52,43 @@ public class TCPClient extends AbstractClient {
         }
     }
 
-    private static long generateChecksum(String requestString) {
+    private long generateChecksum(String requestString) {
         byte [] m = requestString.getBytes();
         Checksum crc32 = new CRC32();
         crc32.update(m, 0, m.length);
         return crc32.getValue();
     }
 
-    private static void sendRequest(PrintWriter out, BufferedReader in, String request) throws IOException {
-        try{
+    private boolean isGetAllRequest(String request) {
+        return request.split("::")[2].equalsIgnoreCase("GET ALL");
+    }
+
+    private void handleHugeResponse(BufferedReader in) throws IOException {
+        StringBuilder responseData = new StringBuilder();
+        String response;
+        System.out.println(in.readLine());
+        while (!(response = in.readLine()).equals("END")) {
+            responseData.append(response).append("\n");
+        }
+        System.out.println(responseData);
+    }
+
+    private void sendRequest(PrintWriter out, BufferedReader in, String request)
+      throws IOException {
+        try {
             request = generateChecksum(request) + "::" + request;
             // Send request to server
             out.println(request);
-            // Receive response from server
-            String responseFromServer = in.readLine();
-            System.out.println(responseFromServer);
-            // Log response
-            ClientLogger.log("Response from server: " + responseFromServer);
-
-        } catch (SocketTimeoutException e){
+            if(isGetAllRequest(request)) {
+                handleHugeResponse(in);
+            } else {
+                // Receive response from server
+                String responseFromServer = in.readLine();
+                System.out.println(responseFromServer);
+                // Log response
+                ClientLogger.log("Response from server: " + responseFromServer);
+            }
+        } catch (SocketTimeoutException e) {
             String[] strArr = request.split("::");
             String requestId = strArr[0];
             System.out.println("Received no response from the server for request id : "+requestId);
@@ -78,8 +96,8 @@ public class TCPClient extends AbstractClient {
         }
     }
 
-    private static void populateKeyValues(BufferedReader in, PrintWriter out) {
-        final int NUM_KEYS = 10;
+    private void populateKeyValues(BufferedReader in, PrintWriter out) {
+        final int NUM_KEYS = 45000;
         try {
             // PUT requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
@@ -105,7 +123,7 @@ public class TCPClient extends AbstractClient {
                 ClientLogger.log("GET key" + key);
             }
             //DELETE requests
-            for (int i = 5; i <= NUM_KEYS*2; i++) {
+            for (int i = 5; i <= 10; i++) {
                 UUID uuid = UUID.randomUUID();
                 String requestId = uuid.toString();
                 String key = Integer.toString(i);

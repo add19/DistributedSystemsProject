@@ -23,7 +23,7 @@ public interface IServer {
 
   /**
    * Processes the input request parsed from handleRequest method.
-   * @param inputLine input request as parsed from handleRequest.
+   * @param tokens input request as parsed from handleRequest.
    */
-  String processRequest(String inputLine);
+  String processRequest(String[] tokens);
 }

@@ -1,13 +1,14 @@
 package Server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class represents the actual key value data store with all the associated operations that
  * can be performed on it.
  */
-class KeyValueStore {
-  private final HashMap<String, String> store;
+class KeyValueStore implements IKeyValueStore {
+  private final Map<String, String> store;
 
   /**
    * Initializes the key value data store.
@@ -22,7 +23,8 @@ class KeyValueStore {
    * @param key The key to be stored.
    * @param value The associated value to be stored.
    */
-  public synchronized void put(String key, String value) {
+  @Override
+  public void put(String key, String value) {
     store.put(key, value);
   }
 
@@ -31,8 +33,21 @@ class KeyValueStore {
    * @param key the key whose value is to be fetched.
    * @return A message containing the corresponding value stored against the key in the data store.
    */
-  public synchronized String get(String key) {
+  @Override
+  public String get(String key) {
     return store.get(key);
+  }
+
+  @Override
+  public String getAll() {
+    if(store.isEmpty()) {
+      return "-1";
+    }
+    StringBuilder sb = new StringBuilder(store.size() + "\n");
+    for(Map.Entry<String, String> entry:store.entrySet()) {
+      sb.append("key:").append(entry.getKey()).append(" value:").append(entry.getValue()).append("\n");
+    }
+    return sb.toString();
   }
 
   /**
@@ -40,7 +55,13 @@ class KeyValueStore {
    * @param key the key to be deleted.
    * @return A message indicating whether the operation is successful or not.
    */
-  public synchronized String delete(String key) {
+  @Override
+  public String delete(String key) {
     return store.remove(key);
+  }
+
+  @Override
+  public void deleteAll() {
+    store.clear();
   }
 }

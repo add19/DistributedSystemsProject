@@ -17,13 +17,13 @@ public class TCPServer extends AbstractServer {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
 
             System.out.println("Server is listening on port " + portNumber);
-            serverLogger.log("Server is listening on port " + portNumber);
+            serverLogger.logServerMessage("Server is listening on port " + portNumber);
 
             while (true) {
                 // Start listening to client requests and creating client socket
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("client.Client connected: " + clientSocket.getInetAddress());
-                serverLogger.logRequest(clientSocket.getInetAddress(), "Client connected");
+                serverLogger.logClientRequest(clientSocket.getInetAddress(), "Client connected");
 
                 try {
                     handleRequest(clientSocket);
@@ -33,7 +33,7 @@ public class TCPServer extends AbstractServer {
                     // log information when client closes connection
                     clientSocket.close();
                     System.out.println("client.Client disconnected");
-                    serverLogger.log("Client disconnected: " + clientSocket.getInetAddress());
+                    serverLogger.logServerMessage("Client disconnected: " + clientSocket.getInetAddress());
                 }
             }
         } catch (IOException e) {
@@ -51,22 +51,35 @@ public class TCPServer extends AbstractServer {
             while ((inputLine = in.readLine()) != null) {
                 System.out.println("Received from client: " + inputLine);
                 // log client request information
-                serverLogger.logRequest(clientSocket.getInetAddress(), inputLine);
+                serverLogger.logClientRequest(clientSocket.getInetAddress(), inputLine);
+
+                String[] parsedTokens = parseRequest(inputLine);
+                if(parsedTokens.length == 0) {
+                    // return an error string.
+                    out.println("Invalid request format");
+                    continue;
+                }
 
                 // get information from the key value store
-                String response = processRequest(inputLine);
-
-                // write back the response to the client
-                out.println(response);
-
-                // log the response information
-                serverLogger.logResponse(clientSocket.getInetAddress(),response);
+                String response = processRequest(parsedTokens);
+                if(parsedTokens[2].equalsIgnoreCase("GET ALL")) {
+                    String[] responseKeyVals = response.split("\n");
+                    for(int i=1; i<responseKeyVals.length; i++) {
+                        System.out.println(responseKeyVals[i]);
+                        out.println(responseKeyVals[i]);
+                    }
+                    out.println("END");
+                } else {
+                    // write back the response to the client
+                    out.println(response);
+                    // log the response information
+                    serverLogger.logServerResponse(clientSocket.getInetAddress(),response);
+                }
             }
         } catch (IOException e) {
             // Log information about timed out requests.
             System.err.println("Timeout occurred. Server did not respond within the specified time.");
-            serverLogger.logMalformedRequest(clientSocket.getInetAddress());
-
+            serverLogger.logTCPMalformedRequest(clientSocket.getInetAddress());
         }
     }
 }
