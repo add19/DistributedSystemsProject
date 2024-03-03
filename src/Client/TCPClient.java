@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
 import java.util.zip.CRC32;
@@ -47,6 +48,9 @@ public class TCPClient extends AbstractClient {
                     break;
                 }
             }
+        } catch (SocketException ex) {
+            System.out.println("Connection terminated by the server...");
+            ClientLogger.log("Connection terminated by the server...");
         } catch (IOException e) {
             e.printStackTrace();
         }

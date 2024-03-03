@@ -33,7 +33,7 @@ public class UDPClient extends AbstractClient {
     } catch (SocketException e) {
       System.out.println("Socket: " + e.getMessage());
     } catch (IOException e) {
-      System.out.println("IO: " + e.getMessage());
+      System.out.println("Looks like server timed out: " + e.getMessage());
     } catch (NumberFormatException e) {
       System.out.println("Invalid port number: " + e.getMessage());
     } catch (ArrayIndexOutOfBoundsException e) {
@@ -53,7 +53,7 @@ public class UDPClient extends AbstractClient {
     return crc32.getValue();
   }
 
-  private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId) {
+  private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId) throws IOException {
     String resp = handleResponse(aSocket, reply, requestId);
     int numKvs = Integer.parseInt(resp.split(":")[1]);
     while(numKvs > 1) {
@@ -92,40 +92,32 @@ public class UDPClient extends AbstractClient {
     } else {
       handleResponse(aSocket, reply, requestId);
     }
-    System.out.println("DONE!");
   }
 
-  private String handleResponse(DatagramSocket aSocket, DatagramPacket reply, long requestId) {
-    try {
+  private String handleResponse(DatagramSocket aSocket, DatagramPacket reply, long requestId)
+    throws IOException {
       // receive response
-      aSocket.receive(reply);
+    aSocket.receive(reply);
 
-      String response = new String(reply.getData(), 0, reply.getLength());
-      if(response.equals("END")) {
-        return "TRANSFER COMPLETE!";
-      }
-
-      String[] responseToken = response.split(":");
-      long responseRequestId = Long.parseLong(responseToken[0]);
-
-      // validating malformed responses from server
-      if(responseRequestId != requestId) {
-        ClientLogger.log("Received Malformed response for request: " + requestId +
-          " ; Received response for " + responseToken[0]);
-      } else {
-        ClientLogger.log("Received response " + response);
-        System.out.println(" Reply: " + new String(reply.getData(), 0, reply.getLength()));
-      }
-      return response;
-    } catch(SocketTimeoutException e) {
-      System.out.println("Request timed out.. received no response from server for request: "
-        + requestId);
-      ClientLogger.log("Request timed out.. received no response from server for request: "
-        + requestId);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    String response = new String(reply.getData(), 0, reply.getLength());
+    if(response.equals("END")) {
+      return "TRANSFER COMPLETE!";
     }
-    return "-1";
+
+    String[] responseToken = response.split(":");
+    long responseRequestId = Long.parseLong(responseToken[0]);
+
+    // validating malformed responses from server
+    if(responseRequestId != requestId) {
+      ClientLogger.log("Received Malformed response for request: " + requestId +
+        " ; Received response for " + responseToken[0]);
+    } else {
+      ClientLogger.log("Received response " + response);
+      System.out.println(" Reply: " + new String(reply.getData(), 0, reply.getLength()));
+    }
+    return response;
+
+//    return "-1";
   }
 
   private void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
