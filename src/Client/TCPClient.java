@@ -20,11 +20,9 @@ public class TCPClient extends AbstractClient {
         try {
             socket = new Socket(serverIP, serverPort);
             socket.setSoTimeout(5000);
-            System.out.println("Connected to the server");
-            ClientLogger.log("Connected to the server");
+            System.out.println("[" + getTimestamp() + "] => " + "Connected to the server");
         } catch (IOException e) {
-            System.out.println("Couldn't connect to server at mentioned IP and port");
-            ClientLogger.log("Couldn't connect to server at mentioned IP and port\"");
+            System.out.println("[" + getTimestamp() + "]" + "Couldn't connect to server at mentioned IP and port");
             System.exit(1);
         }
 
@@ -49,8 +47,7 @@ public class TCPClient extends AbstractClient {
                 }
             }
         } catch (SocketException ex) {
-            System.out.println("Connection terminated by the server...");
-            ClientLogger.log("Connection terminated by the server...");
+            System.out.println("[" + getTimestamp() + "]" + "Connection terminated by the server...");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,15 +84,13 @@ public class TCPClient extends AbstractClient {
             } else {
                 // Receive response from server
                 String responseFromServer = in.readLine();
-                System.out.println(responseFromServer);
                 // Log response
-                ClientLogger.log("Response from server: " + responseFromServer);
+                System.out.println("[" + getTimestamp() + "] => Response from server: " + responseFromServer);
             }
         } catch (SocketTimeoutException e) {
             String[] strArr = request.split("::");
             String requestId = strArr[0];
-            System.out.println("Received no response from the server for request id : "+requestId);
-            ClientLogger.log("Received no response from the server for the request id : "+requestId);
+            System.out.println("[" + getTimestamp() + "] => " + "Received no response from the server for request id : "+requestId);
         }
     }
 
@@ -111,8 +106,7 @@ public class TCPClient extends AbstractClient {
                 String putString = requestId + "::PUT::key" + key + "::value" + value;
 
                 sendRequest(out, in, putString);
-                System.out.println("Pre-populated key" + key + " with value " + value);
-                ClientLogger.log("Pre-populated key" + key + " with value " + value);
+//                System.out.println("[" + getTimestamp() + "]" + "Pre-populated key" + key + " with value " + value);
             }
             //GET requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
@@ -122,8 +116,7 @@ public class TCPClient extends AbstractClient {
                 String getString = requestId + "::GET::key" + key;
 
                 sendRequest(out, in, getString);
-                System.out.println("GET key" + key);
-                ClientLogger.log("GET key" + key);
+//                System.out.println("[" + getTimestamp() + "]" + "GET key" + key);
             }
             //DELETE requests
             for (int i = 5; i <= 10; i++) {
@@ -133,8 +126,7 @@ public class TCPClient extends AbstractClient {
                 String deleteString = requestId + "::DELETE::key" + key;
 
                 sendRequest(out, in, deleteString);
-                System.out.println("DELETE key" + key);
-                ClientLogger.log("DELETE key" + key);
+//                System.out.println("[" + getTimestamp() + "]" + "DELETE key" + key);
             }
         } catch (IOException e) {
             e.printStackTrace();

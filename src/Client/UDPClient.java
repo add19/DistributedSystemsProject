@@ -95,7 +95,6 @@ public class UDPClient extends AbstractClient {
     aSocket.receive(reply);
 
     String response = new String(reply.getData(), 0, reply.getLength());
-    System.out.println(response);
     if(response.equals("END")) {
       return "TRANSFER COMPLETE!";
     }
@@ -105,12 +104,12 @@ public class UDPClient extends AbstractClient {
 
     // validating malformed responses from server
     if(responseRequestId != requestId) {
-      System.out.println("Received Malformed response for request: " + requestId +
+      System.out.println("[" + getTimestamp() + "] => " +
+        "Received Malformed response for request: " + requestId +
         " ; Received response for " + responseToken[0]);
       return "TRANSFER COMPLETE!";
     } else {
-      ClientLogger.log("Received response " + response);
-      System.out.println(" Reply: " + new String(reply.getData(), 0, reply.getLength()));
+      System.out.println("[" + getTimestamp() + "] => " + " Server Reply: " + new String(reply.getData(), 0, reply.getLength()));
     }
     return response;
   }

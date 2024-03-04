@@ -2,6 +2,8 @@ package Client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public abstract class AbstractClient implements IClient {
@@ -70,5 +72,9 @@ public abstract class AbstractClient implements IClient {
     String key = userInput.readLine();
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "DELETE" + "::" + key;
+  }
+
+  protected String getTimestamp() {
+    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
   }
 }

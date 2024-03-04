@@ -14,7 +14,6 @@ public abstract class AbstractServer implements IServer {
 
   public String[] parseRequest(String inputLine) {
     String[] tokens = inputLine.split("::");
-    System.out.println(inputLine);
     if (tokens.length < 3) {
       return new String[0];
     }

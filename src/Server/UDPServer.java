@@ -61,7 +61,7 @@ public class UDPServer extends AbstractServer {
           DatagramPacket reply = new DatagramPacket(response.getBytes(),
             response.getBytes().length, request.getAddress(), request.getPort());
           aSocket.send(reply);
-          System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
+          System.out.println("Response to [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
         }
 //        System.out.println("DONE SENDING");
       }
@@ -126,7 +126,7 @@ public class UDPServer extends AbstractServer {
       reply = new DatagramPacket(resp.getBytes(),
         resp.getBytes().length, request.getAddress(), request.getPort());
       aSocket.send(reply);
-      System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + resp);
+      System.out.println("Response to [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + resp);
     }
     String resp = "END";
     reply = new DatagramPacket(resp.getBytes(),
