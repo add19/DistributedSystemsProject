@@ -2,6 +2,8 @@ package Server;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Abstract class that implements common functionalities like processing key value store read/write
@@ -9,7 +11,6 @@ import java.net.Socket;
  */
 public abstract class AbstractServer implements IServer {
   private static final IKeyValueStore keyValueStore = new KeyValueStore();
-  static final ServerLogger serverLogger = new ServerLogger();
 
   public String[] parseRequest(String inputLine) {
     String[] tokens = inputLine.split("::");
@@ -40,7 +41,7 @@ public abstract class AbstractServer implements IServer {
             : (requestId + ": Key '" + key + "' not found");
       case "GET ALL":
         String response = keyValueStore.getAll();
-        return response.equals("-1") ? requestId + ": Empty Store '" : (requestId + ":" + response); // TODO: Test empty scenario
+        return response.equals("-1") ? requestId + ": -1" : (requestId + ":" + response);
       case "DELETE":
         key = tokens[3];
         String removedValue = keyValueStore.delete(key);
@@ -56,6 +57,10 @@ public abstract class AbstractServer implements IServer {
 
   @Override
   public void handleRequest(Socket clientSocket) throws IOException {
-    serverLogger.logServerMessage("Unable to process request. Server handle request behavior undefined");
+    System.out.println("[" + getTimestamp() + "]=> " + "Unable to process request. Server handle request behavior undefined");
+  }
+
+  protected String getTimestamp() {
+    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
   }
 }

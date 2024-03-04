@@ -70,7 +70,6 @@ public class TCPClient extends AbstractClient {
     private void handleHugeResponse(BufferedReader in) throws IOException {
         StringBuilder responseData = new StringBuilder();
         String response;
-        System.out.println(in.readLine());
         while (!(response = in.readLine()).equals("END")) {
             responseData.append(response).append("\n");
         }

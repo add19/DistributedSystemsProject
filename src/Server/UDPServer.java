@@ -19,8 +19,7 @@ public class UDPServer extends AbstractServer {
 
     // Server socket creation on specified port number.
     try (DatagramSocket aSocket = new DatagramSocket(portNumber)) {
-      serverLogger.logServerMessage("Server active on port " + portNumber);
-
+      System.out.println("[" + getTimestamp() + "]=> " + "Server active on port " + portNumber);
       while (true) {
         byte[] buffer = new byte[1000];
 
@@ -32,7 +31,8 @@ public class UDPServer extends AbstractServer {
         // Validating requests on server side.
         if (!validRequest(request)) {
           String response = "Couldn't process request.";
-          serverLogger.logUDPMalformedRequest(request.getAddress(), request.getLength());
+          System.out.println("Malformed Response from [" + request.getAddress() + "] @ [" + getTimestamp() + "]=> length " + request.getLength());
+
           DatagramPacket reply = new DatagramPacket(response.getBytes(),
             response.getBytes().length, request.getAddress(), request.getPort());
           aSocket.send(reply);
@@ -41,7 +41,8 @@ public class UDPServer extends AbstractServer {
 
         // parsing and processing request
         String msg = new String(request.getData(), 0, request.getLength());
-        serverLogger.logClientRequest(request.getAddress(), msg);
+        System.out.println("Request originating from [" + request.getAddress() + "] @ [" + getTimestamp() + "]=> " + msg);
+
         String[] parsedTokens = parseRequest(msg);
         String response = "";
         if(parsedTokens.length == 0) {
@@ -60,9 +61,9 @@ public class UDPServer extends AbstractServer {
           DatagramPacket reply = new DatagramPacket(response.getBytes(),
             response.getBytes().length, request.getAddress(), request.getPort());
           aSocket.send(reply);
-          serverLogger.logServerResponse(reply.getAddress(),response);
+          System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
         }
-        System.out.println("DONE SENDING");
+//        System.out.println("DONE SENDING");
       }
     } catch (SocketException e) {
       System.out.println("Socket: " + e.getMessage());
@@ -108,17 +109,24 @@ public class UDPServer extends AbstractServer {
     String[] responseKeyVals = response.split("\n");
     String id = responseKeyVals[0].split(":")[0];
 
+    if(responseKeyVals[0].split(":")[1].equals(" -1")) {
+      String resp = "END";
+      DatagramPacket reply = new DatagramPacket(resp.getBytes(),
+        resp.getBytes().length, request.getAddress(), request.getPort());
+      aSocket.send(reply);
+      return;
+    }
     DatagramPacket reply = new DatagramPacket(responseKeyVals[0].getBytes(),
       responseKeyVals[0].getBytes().length, request.getAddress(), request.getPort());
     aSocket.send(reply);
-    serverLogger.logServerResponse(reply.getAddress(),responseKeyVals[0]);
+//    System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
 
     for(int i=1; i<responseKeyVals.length; i++) {
       String resp = id + ":" + responseKeyVals[i];
       reply = new DatagramPacket(resp.getBytes(),
         resp.getBytes().length, request.getAddress(), request.getPort());
       aSocket.send(reply);
-      serverLogger.logServerResponse(reply.getAddress(),resp);
+      System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + resp);
     }
     String resp = "END";
     reply = new DatagramPacket(resp.getBytes(),
@@ -129,7 +137,8 @@ public class UDPServer extends AbstractServer {
   private void handleInvalidRequest(DatagramSocket aSocket, DatagramPacket request)
     throws IOException {
     String response = "Couldn't process request.";
-    serverLogger.logUDPMalformedRequest(request.getAddress(), request.getLength());
+    System.out.println("Malformed Response from [" + request.getAddress() + "] @ [" + getTimestamp() + "]=> length " + request.getLength());
+
     DatagramPacket reply = new DatagramPacket(response.getBytes(),
       response.getBytes().length, request.getAddress(), request.getPort());
     aSocket.send(reply);

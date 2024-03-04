@@ -55,13 +55,8 @@ public class UDPClient extends AbstractClient {
 
   private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId) throws IOException {
     String resp = handleResponse(aSocket, reply, requestId);
-    int numKvs = Integer.parseInt(resp.split(":")[1]);
-    while(numKvs > 1) {
-      String response = handleResponse(aSocket, reply, requestId);
-      if(response.equals("TRANSFER COMPLETE!")) {
-        break;
-      }
-      numKvs--;
+    while(!resp.equals("TRANSFER COMPLETE!")) {
+      resp = handleResponse(aSocket, reply, requestId);
     }
   }
 
@@ -100,6 +95,7 @@ public class UDPClient extends AbstractClient {
     aSocket.receive(reply);
 
     String response = new String(reply.getData(), 0, reply.getLength());
+    System.out.println(response);
     if(response.equals("END")) {
       return "TRANSFER COMPLETE!";
     }
@@ -109,15 +105,14 @@ public class UDPClient extends AbstractClient {
 
     // validating malformed responses from server
     if(responseRequestId != requestId) {
-      ClientLogger.log("Received Malformed response for request: " + requestId +
+      System.out.println("Received Malformed response for request: " + requestId +
         " ; Received response for " + responseToken[0]);
+      return "TRANSFER COMPLETE!";
     } else {
       ClientLogger.log("Received response " + response);
       System.out.println(" Reply: " + new String(reply.getData(), 0, reply.getLength()));
     }
     return response;
-
-//    return "-1";
   }
 
   private void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
