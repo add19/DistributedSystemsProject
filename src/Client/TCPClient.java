@@ -15,11 +15,12 @@ import java.util.zip.Checksum;
  * This is a TCP Client class, that interacts with the server.
  */
 public class TCPClient extends AbstractClient {
+    private static final int TIMEOUT_INTERVAL = 5000;
     public void startClient(String serverIP, int serverPort) {
         Socket socket = null;
         try {
             socket = new Socket(serverIP, serverPort);
-            socket.setSoTimeout(5000);
+            socket.setSoTimeout(TIMEOUT_INTERVAL);
             System.out.println("[" + getTimestamp() + "] => " + "Connected to the server");
         } catch (IOException e) {
             System.out.println("[" + getTimestamp() + "]" + "Couldn't connect to server at mentioned IP and port");

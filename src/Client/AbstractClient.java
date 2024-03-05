@@ -7,7 +7,8 @@ import java.util.Date;
 import java.util.UUID;
 
 public abstract class AbstractClient implements IClient {
-  public String generateRequestFromUserChoice(BufferedReader userInput) throws IOException {
+
+  private void displayUserChoices() {
     System.out.println("Specify operation:");
     System.out.println("Input [1] -> PUT");
     System.out.println("Input [2] -> GET");
@@ -15,6 +16,10 @@ public abstract class AbstractClient implements IClient {
     System.out.println("Input [4] -> DELETE");
     System.out.println("Input [5] -> DELETE ALL");
     System.out.print("Enter your choice: ");
+  }
+
+  public String generateRequestFromUserChoice(BufferedReader userInput) throws IOException {
+    displayUserChoices();
 
     String choice = userInput.readLine();
 
@@ -41,9 +46,19 @@ public abstract class AbstractClient implements IClient {
     return request;
   }
 
+
+  private String getKey(BufferedReader userInput) throws IOException {
+    System.out.print("Please enter the key: ");
+    return userInput.readLine();
+  }
+
+  private String getValue(BufferedReader userInput) throws IOException {
+    System.out.print("Please enter the value for the key: ");
+    return userInput.readLine();
+  }
+
   private String generateGetRequest(BufferedReader userInput) throws IOException {
-    System.out.print("Please enter the key (integer): ");
-    String key = userInput.readLine();
+    String key = getKey(userInput);
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "GET" + "::" + key;
   }
@@ -59,17 +74,14 @@ public abstract class AbstractClient implements IClient {
   }
 
   private String generatePutRequest(BufferedReader userInput) throws IOException {
-    System.out.print("Please enter the key: ");
-    String key = userInput.readLine();
-    System.out.print("Please enter the value for the key: ");
-    String value = userInput.readLine();
+    String key = getKey(userInput);
+    String value = getValue(userInput);
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "PUT" + "::" + key + "::" + value;
   }
 
   private String generateDeleteRequest(BufferedReader userInput) throws IOException {
-    System.out.print("Please enter the key (integer): ");
-    String key = userInput.readLine();
+    String key = getKey(userInput);
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "DELETE" + "::" + key;
   }

@@ -6,11 +6,16 @@ import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+
 /**
- * This represents the UDP client which communicates to the UDP server over a given port and host
- * address.
+ * This class represents a client which communicates to server using UDP protocol. Given a
+ * server host IP address and the port number, this client starts communicating with the server
+ * at the specified host and port. This class extends the AbstractClient class that has the protocol
+ * agnostic functionalities for clients.
  */
 public class UDPClient extends AbstractClient {
+  private static final int TIMEOUT_INTERVAL = 5000;
+
   @Override
   public void startClient(String serverIp, int portNum) {
     try (DatagramSocket aSocket = new DatagramSocket();
@@ -53,11 +58,17 @@ public class UDPClient extends AbstractClient {
     return crc32.getValue();
   }
 
-  private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId) throws IOException {
+  private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId)
+      throws IOException {
     String resp = handleResponse(aSocket, reply, requestId);
-    while(!resp.equals("TRANSFER COMPLETE!")) {
+    int idx = 0;
+    while(!resp.contains("END =>")) {
       resp = handleResponse(aSocket, reply, requestId);
+      idx++;
     }
+    System.out.println("Expected : " + resp.split("=>")[1] + " Received : " + idx);
+    System.out.println(Integer.parseInt(resp.split("=>")[1]) == idx ?
+        "No packet loss during transmission of all key values" : "Some packets may be lost");
   }
 
   private void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
@@ -78,7 +89,7 @@ public class UDPClient extends AbstractClient {
     aSocket.send(request);
 
     // setting timeout of 5 seconds for udp request and waiting for response from server
-    aSocket.setSoTimeout(5000);
+    aSocket.setSoTimeout(TIMEOUT_INTERVAL);
     byte[] buffer = new byte[1000];
     DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 
@@ -95,8 +106,8 @@ public class UDPClient extends AbstractClient {
     aSocket.receive(reply);
 
     String response = new String(reply.getData(), 0, reply.getLength());
-    if(response.equals("END")) {
-      return "TRANSFER COMPLETE!";
+    if(response.contains("END =>")) {
+      return response;
     }
 
     String[] responseToken = response.split(":");
@@ -107,7 +118,7 @@ public class UDPClient extends AbstractClient {
       System.out.println("[" + getTimestamp() + "] => " +
         "Received Malformed response for request: " + requestId +
         " ; Received response for " + responseToken[0]);
-      return "TRANSFER COMPLETE!";
+      return "END =>" + response;
     } else {
       System.out.println("[" + getTimestamp() + "] => " + " Server Reply: " + new String(reply.getData(), 0, reply.getLength()));
     }

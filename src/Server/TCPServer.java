@@ -59,7 +59,6 @@ public class TCPServer extends AbstractServer {
                 if(parsedTokens[2].equalsIgnoreCase("GET ALL")) {
                     String[] responseKeyVals = response.split("\n");
                     for(int i=1; i<responseKeyVals.length; i++) {
-                        System.out.println(responseKeyVals[i]);
                         out.println(responseKeyVals[i]);
                     }
                     out.println("END");

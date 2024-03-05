@@ -10,8 +10,8 @@ import java.util.zip.Checksum;
 
 /**
  * This represents a UDP server which receives datagram requests, validates them and sends responses
- * to the client. This class extends the abstract server class which has the common implementation
- * to handle key value requests.
+ * to the client. This class extends the abstract server class which supports all the protocol
+ * agnostic operations.
  */
 public class UDPServer extends AbstractServer {
   @Override
@@ -63,7 +63,6 @@ public class UDPServer extends AbstractServer {
           aSocket.send(reply);
           System.out.println("Response to [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
         }
-//        System.out.println("DONE SENDING");
       }
     } catch (SocketException e) {
       System.out.println("Socket: " + e.getMessage());
@@ -110,16 +109,13 @@ public class UDPServer extends AbstractServer {
     String id = responseKeyVals[0].split(":")[0];
 
     if(responseKeyVals[0].split(":")[1].equals(" -1")) {
-      String resp = "END";
+      String resp = "END =>" + 0;
       DatagramPacket reply = new DatagramPacket(resp.getBytes(),
         resp.getBytes().length, request.getAddress(), request.getPort());
       aSocket.send(reply);
       return;
     }
-    DatagramPacket reply = new DatagramPacket(responseKeyVals[0].getBytes(),
-      responseKeyVals[0].getBytes().length, request.getAddress(), request.getPort());
-    aSocket.send(reply);
-//    System.out.println("Response originating for [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + response);
+    DatagramPacket reply;
 
     for(int i=1; i<responseKeyVals.length; i++) {
       String resp = id + ":" + responseKeyVals[i];
@@ -128,7 +124,7 @@ public class UDPServer extends AbstractServer {
       aSocket.send(reply);
       System.out.println("Response to [" + reply.getAddress() + "] @ [" + getTimestamp() + "]=> " + resp);
     }
-    String resp = "END";
+    String resp = "END =>" + (responseKeyVals.length - 1);
     reply = new DatagramPacket(resp.getBytes(),
       resp.getBytes().length, request.getAddress(), request.getPort());
     aSocket.send(reply);
