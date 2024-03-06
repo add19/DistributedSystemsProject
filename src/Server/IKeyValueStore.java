@@ -14,6 +14,7 @@ public interface IKeyValueStore {
 
   /**
    * Gets the value for a given key from the data store.
+   *
    * @param key the key whose value is to be fetched.
    * @return A message containing the corresponding value stored against the key in the data store.
    */
@@ -21,19 +22,22 @@ public interface IKeyValueStore {
 
   /**
    * Gets all the key value elements from the store.
-   * @return A message containing the corresponding value stored against the key in the data store.
+   *
+   * @return All the key value elements in the serialized format delimited by new line character.
    */
   String getAll();
 
   /**
    * Deletes the given key and its corresponding value from the data store.
+   *
    * @param key the key to be deleted.
    * @return A message indicating whether the operation is successful or not.
    */
   String delete(String key);
 
   /**
-   * Deletes all the keys and its corresponding values from the data store.
+   * Deletes all the keys and its corresponding values from the data store, basically clearing the
+   * memory but without destroying the key value store instance itself.
    */
   void deleteAll();
 }

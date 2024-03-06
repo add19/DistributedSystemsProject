@@ -1,13 +1,13 @@
 package Client;
 
 /**
- * This class starts an instance of a UDP client.
+ * This is the start-up class for the UDP based client.
  */
 public class ClientAppUDP {
   public static void main(String[] args) {
-    if (args.length < 2) {
+    if (args.length != 2) {
       System.out.println(
-        "Usage: java ClientAppUDP <serverIP> <port>");
+        "Correct Usage: java ClientAppUDP [server-ip] [server-port]");
       System.exit(1);
     }
     String serverIP = args[0];
@@ -16,5 +16,4 @@ public class ClientAppUDP {
     IClient client = new UDPClient();
     client.startClient(serverIP, serverPort);
   }
-
 }

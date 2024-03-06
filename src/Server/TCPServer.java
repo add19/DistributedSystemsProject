@@ -19,7 +19,9 @@ public class TCPServer extends AbstractServer {
             while (true) {
                 // Start listening to client requests and creating client socket
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Request originating from [" + clientSocket.getInetAddress() + "] @ [" + getTimestamp() + "]=> " + "Client connected");
+                System.out.println("Request originating from ["
+                    + clientSocket.getInetAddress() + "] @ [" + getTimestamp() + "]=> "
+                    + "Client connected");
 
                 try {
                     handleRequest(clientSocket);
@@ -28,7 +30,8 @@ public class TCPServer extends AbstractServer {
                 } finally {
                     // log information when client closes connection
                     clientSocket.close();
-                    System.out.println("[" + getTimestamp() + "]=> " + "Client disconnected: " + clientSocket.getInetAddress());
+                    System.out.println("[" + getTimestamp() + "]=> "
+                        + "Client disconnected: " + clientSocket.getInetAddress());
                 }
             }
         } catch (IOException e) {
@@ -36,8 +39,7 @@ public class TCPServer extends AbstractServer {
         }
     }
 
-    @Override
-    public void handleRequest(Socket clientSocket) throws IOException {
+    private void handleRequest(Socket clientSocket) throws IOException {
         try (
           BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
@@ -45,7 +47,8 @@ public class TCPServer extends AbstractServer {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 // log client request information
-                System.out.println("Request originating from [" + clientSocket.getInetAddress() + "] @ [" + getTimestamp() + "]=> " + inputLine);
+                System.out.println("Request originating from [" + clientSocket.getInetAddress()
+                    + "] @ [" + getTimestamp() + "]=> " + inputLine);
 
                 String[] parsedTokens = parseRequest(inputLine);
                 if(parsedTokens.length == 0) {
@@ -66,13 +69,15 @@ public class TCPServer extends AbstractServer {
                     // write back the response to the client
                     out.println(response);
                     // log the response information
-                    System.out.println("Response originating for [" + clientSocket.getInetAddress() + "] @ [" + getTimestamp() + "]=> " + response);
+                    System.out.println("Response originating for [" + clientSocket.getInetAddress()
+                        + "] @ [" + getTimestamp() + "]=> " + response);
                 }
             }
         } catch (IOException e) {
             // Log information about timed out requests.
             System.err.println("Timeout occurred. Server did not respond within the specified time.");
-            System.out.println("Response time out from [" + clientSocket.getInetAddress() + "] @ [" + getTimestamp() + "]");
+            System.out.println("Response time out from [" + clientSocket.getInetAddress()
+                + "] @ [" + getTimestamp() + "]");
         }
     }
 }

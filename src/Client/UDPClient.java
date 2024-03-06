@@ -2,9 +2,6 @@ package Client;
 
 import java.net.*;
 import java.io.*;
-import java.util.UUID;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 
 /**
@@ -14,7 +11,10 @@ import java.util.zip.Checksum;
  * agnostic functionalities for clients.
  */
 public class UDPClient extends AbstractClient {
+  // Time out duration, currently set to 5 seconds
   private static final int TIMEOUT_INTERVAL = 5000;
+
+  private static final int BUFFER_SIZE = 65000;
 
   @Override
   public void startClient(String serverIp, int portNum) {
@@ -46,18 +46,6 @@ public class UDPClient extends AbstractClient {
     }
   }
 
-  private String generateUUID() {
-    UUID uuid = UUID.randomUUID();
-    return uuid.toString();
-  }
-
-  private long generateChecksum(String requestString) {
-    byte [] m = requestString.getBytes();
-    Checksum crc32 = new CRC32();
-    crc32.update(m, 0, m.length);
-    return crc32.getValue();
-  }
-
   private void handleLargeResponses(DatagramSocket aSocket, DatagramPacket reply, long requestId)
       throws IOException {
     String resp = handleResponse(aSocket, reply, requestId);
@@ -72,7 +60,7 @@ public class UDPClient extends AbstractClient {
   }
 
   private void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
-    int serverPort) throws IOException {
+      int serverPort) throws IOException {
 
     // Parse request information from the request string.
     String[] requestToken = requestString.split("::");
@@ -90,7 +78,7 @@ public class UDPClient extends AbstractClient {
 
     // setting timeout of 5 seconds for udp request and waiting for response from server
     aSocket.setSoTimeout(TIMEOUT_INTERVAL);
-    byte[] buffer = new byte[1000];
+    byte[] buffer = new byte[BUFFER_SIZE];
     DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
 
     if(action.equalsIgnoreCase("GET ALL")) {

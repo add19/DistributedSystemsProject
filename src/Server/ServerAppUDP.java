@@ -6,7 +6,7 @@ package Server;
 public class ServerAppUDP {
     public static void main(String[] args) {
       if (args.length != 1) {
-        System.out.println("Usage: java Server <udp-port>");
+        System.out.println("Correct Usage: java Server/ServerAppUDP [udp-port]");
         System.exit(1);
       }
 

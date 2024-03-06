@@ -5,7 +5,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
+/**
+ * Offers all the protocol agnostic functionalities such as displaying user prompts, taking user
+ * inputs, generating checksums for clients extending this abstract class.
+ */
 public abstract class AbstractClient implements IClient {
 
   private void displayUserChoices() {
@@ -16,6 +22,19 @@ public abstract class AbstractClient implements IClient {
     System.out.println("Input [4] -> DELETE");
     System.out.println("Input [5] -> DELETE ALL");
     System.out.print("Enter your choice: ");
+  }
+
+  protected String generateUUID() {
+    UUID uuid = UUID.randomUUID();
+    return uuid.toString();
+  }
+
+
+  protected long generateChecksum(String requestString) {
+    byte [] m = requestString.getBytes();
+    Checksum crc32 = new CRC32();
+    crc32.update(m, 0, m.length);
+    return crc32.getValue();
   }
 
   public String generateRequestFromUserChoice(BufferedReader userInput) throws IOException {
@@ -46,7 +65,6 @@ public abstract class AbstractClient implements IClient {
     return request;
   }
 
-
   private String getKey(BufferedReader userInput) throws IOException {
     System.out.print("Please enter the key: ");
     return userInput.readLine();
@@ -63,12 +81,12 @@ public abstract class AbstractClient implements IClient {
     return requestId + "::" + "GET" + "::" + key;
   }
 
-  private String generateGetAllRequest() throws IOException {
+  private String generateGetAllRequest() {
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "GET ALL";
   }
 
-  private String generateDeleteAllRequest() throws IOException {
+  private String generateDeleteAllRequest() {
     String requestId = UUID.randomUUID().toString();
     return requestId + "::" + "DELETE ALL";
   }

@@ -1,7 +1,5 @@
 package Server;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,21 +18,21 @@ public abstract class AbstractServer implements IServer {
     return tokens;
   }
 
-  public String processRequest(String[] tokens) {
-    String requestId = tokens[0];
-    String operation = tokens[2];
-    String value = tokens.length > 4 ? tokens[4] : null;
+  public String processRequest(String[] requestParams) {
+    String requestId = requestParams[0];
+    String function = requestParams[2];
+    String value = requestParams.length > 4 ? requestParams[4] : null;
 
-    switch (operation.toUpperCase()) {
+    switch (function.toUpperCase()) {
       case "PUT":
-        String key = tokens[3];
+        String key = requestParams[3];
         if (value == null) {
           return requestId + ": PUT operation requires a value";
         }
         keyValueStore.put(key, value);
         return requestId + ": Key '" + key + "' stored with value '" + value + "'";
       case "GET":
-        key = tokens[3];
+        key = requestParams[3];
         String storedValue = keyValueStore.get(key);
         return (storedValue != null) ? (requestId + ": Value for key '" + key + "': " + storedValue)
             : (requestId + ": Key '" + key + "' not found");
@@ -42,21 +40,16 @@ public abstract class AbstractServer implements IServer {
         String response = keyValueStore.getAll();
         return response.equals("-1") ? requestId + ": -1" : (requestId + ":" + response);
       case "DELETE":
-        key = tokens[3];
+        key = requestParams[3];
         String removedValue = keyValueStore.delete(key);
         return (removedValue != null) ? (requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'")
             : requestId + ": Key '" + key + "' not found";
       case "DELETE ALL":
         keyValueStore.deleteAll();
-        return requestId + ": Deleted All keys '";
+        return requestId + ": Deleted All keys ";
       default:
-        return requestId + ": Unsupported operation: " + operation;
+        return requestId + ": Unsupported operation: " + function;
     }
-  }
-
-  @Override
-  public void handleRequest(Socket clientSocket) throws IOException {
-    System.out.println("[" + getTimestamp() + "]=> " + "Unable to process request. Server handle request behavior undefined");
   }
 
   protected String getTimestamp() {

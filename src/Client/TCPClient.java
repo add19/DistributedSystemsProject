@@ -7,15 +7,17 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.UUID;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 /**
- * This is a TCP Client class, that interacts with the server.
+ * This class represents a client which communicates to server using TCP protocol. Given a
+ * server host IP address and the port number, this client starts communicating with the server
+ * at the specified host and port. This supports reliable and connection oriented communication
+ * with the server.
  */
 public class TCPClient extends AbstractClient {
+    // Time out duration, currently set to 5 seconds
     private static final int TIMEOUT_INTERVAL = 5000;
+
     public void startClient(String serverIP, int serverPort) {
         Socket socket = null;
         try {
@@ -23,7 +25,8 @@ public class TCPClient extends AbstractClient {
             socket.setSoTimeout(TIMEOUT_INTERVAL);
             System.out.println("[" + getTimestamp() + "] => " + "Connected to the server");
         } catch (IOException e) {
-            System.out.println("[" + getTimestamp() + "]" + "Couldn't connect to server at mentioned IP and port");
+            System.out.println("[" + getTimestamp() + "]"
+                + "Couldn't connect to server at mentioned IP and port");
             System.exit(1);
         }
 
@@ -48,18 +51,13 @@ public class TCPClient extends AbstractClient {
                 }
             }
         } catch (SocketException ex) {
-            System.out.println("[" + getTimestamp() + "]" + "Connection terminated by the server...");
+            System.out.println("[" + getTimestamp() + "] => "
+                + "Connection terminated by the server...");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private long generateChecksum(String requestString) {
-        byte [] m = requestString.getBytes();
-        Checksum crc32 = new CRC32();
-        crc32.update(m, 0, m.length);
-        return crc32.getValue();
-    }
 
     private boolean isGetAllRequest(String request) {
         return request.split("::")[2].equalsIgnoreCase("GET ALL");
@@ -68,7 +66,7 @@ public class TCPClient extends AbstractClient {
     private void handleHugeResponse(BufferedReader in) throws IOException {
         StringBuilder responseData = new StringBuilder();
         String response;
-        while (!(response = in.readLine()).equals("END")) {
+        while (((response = in.readLine()) != null) && !(response).equals("END")) {
             responseData.append(response).append("\n");
         }
         System.out.println(responseData);
@@ -86,12 +84,17 @@ public class TCPClient extends AbstractClient {
                 // Receive response from server
                 String responseFromServer = in.readLine();
                 // Log response
-                System.out.println("[" + getTimestamp() + "] => Response from server: " + responseFromServer);
+                System.out.println("[" + getTimestamp() + "] => Response from server: "
+                    + responseFromServer);
             }
         } catch (SocketTimeoutException e) {
             String[] strArr = request.split("::");
             String requestId = strArr[0];
-            System.out.println("[" + getTimestamp() + "] => " + "Received no response from the server for request id : "+requestId);
+            System.out.println("[" + getTimestamp() + "] => "
+                + "Received no response from the server for request id : "+requestId);
+        } catch (SocketException e) {
+            System.out.println("[" + getTimestamp() + "] => "
+              + "Server unavailable to handle requests");
         }
     }
 
@@ -100,34 +103,22 @@ public class TCPClient extends AbstractClient {
         try {
             // PUT requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
-                UUID uuid = UUID.randomUUID();
-                String requestId = uuid.toString();
                 String key = Integer.toString(i);
                 String value = Integer.toString(i * 10);
-                String putString = requestId + "::PUT::key" + key + "::value" + value;
-
+                String putString = generateUUID() + "::PUT::key" + key + "::value" + value;
                 sendRequest(out, in, putString);
-//                System.out.println("[" + getTimestamp() + "]" + "Pre-populated key" + key + " with value " + value);
             }
             //GET requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
-                UUID uuid = UUID.randomUUID();
-                String requestId = uuid.toString();
                 String key = Integer.toString(i);
-                String getString = requestId + "::GET::key" + key;
-
+                String getString = generateUUID() + "::GET::key" + key;
                 sendRequest(out, in, getString);
-//                System.out.println("[" + getTimestamp() + "]" + "GET key" + key);
             }
             //DELETE requests
             for (int i = 5; i <= 10; i++) {
-                UUID uuid = UUID.randomUUID();
-                String requestId = uuid.toString();
                 String key = Integer.toString(i);
-                String deleteString = requestId + "::DELETE::key" + key;
-
+                String deleteString = generateUUID() + "::DELETE::key" + key;
                 sendRequest(out, in, deleteString);
-//                System.out.println("[" + getTimestamp() + "]" + "DELETE key" + key);
             }
         } catch (IOException e) {
             e.printStackTrace();

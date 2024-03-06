@@ -1,13 +1,15 @@
 package Client;
 
 /**
- * This represents the client application and the required operations to start the application.
+ * This interface represents the client application and the required operations for any type of
+ * client to start its application.
  */
 public interface IClient {
 
   /**
-   * Starts client process to send request to server on given port and IP address.
-   * @param serverIp server's IP address to send request.
+   * Initiates client process to send and receive messages from server at the given IP and port
+   *
+   * @param serverIp IP address of the server to send request.
    * @param portNum server's port number on which it listens to client requests.
    */
   void startClient(String serverIp, int portNum);
