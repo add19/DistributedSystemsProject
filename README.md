@@ -14,22 +14,25 @@ UDP each
 * The following is our project structure.
 ```bash
 .
-├── Client
-│   ├── AbstractClient.java
-│   ├── ClientAppTCP.java
-│   ├── ClientAppUDP.java
-│   ├── IClient.java
-│   ├── TCPClient.java
-│   └── UDPClient.java
-└── Server
-    ├── AbstractServer.java
-    ├── DataStore.java
-    ├── IDataStore.java
-    ├── IServer.java
-    ├── ServerAppTCP.java
-    ├── ServerAppUDP.java
-    ├── TCPServer.java
-    └── UDPServer.java
+├── README.md
+└── src
+    ├── Client
+    │   ├── AbstractClient.java
+    │   ├── ClientAppTCP.java
+    │   ├── ClientAppUDP.java
+    │   ├── IClient.java
+    │   ├── TCPClient.java
+    │   └── UDPClient.java
+    ├── ExecutiveSummary.txt
+    └── Server
+        ├── AbstractServer.java
+        ├── DataStore.java
+        ├── IDataStore.java
+        ├── IServer.java
+        ├── ServerAppTCP.java
+        ├── ServerAppUDP.java
+        ├── TCPServer.java
+        └── UDPServer.java
 ```
 * Compile the code using `javac Server/*.java Client/*.java`
 * To run the 
