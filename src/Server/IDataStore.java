@@ -3,7 +3,7 @@ package Server;
 /**
  * Represents the key value store and the operations supported for the server to utilize.
  */
-public interface IKeyValueStore {
+public interface IDataStore {
   /**
    * Inserts a given key and assigns it a given value in the data store.
    *

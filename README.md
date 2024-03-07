@@ -57,14 +57,56 @@ UDP each
 
 
 ## Executive Summary
-For the Project1, requirement of the assignment was to make students understand how TCP and UDP works and what is the 
-difference in the implementation of these protocols. Also, through this assignment, we were supposed to learn how 
-server and client communicate regardless of the protocol. Through refactoring and modularizing the code, we understood 
-how to write clean and easily understandable code. Since, this project required only single threaded server, it was 
-intended for us to focus on implementation of 1 request at a time and handle various scenarios such as malformed 
-request and implementing timeout at client side when server doesn’t respond in given time. Creating client and server
-logs made sure that all the request and response messages are saved in human-readable form to read the status of the 
-protocol messages.
+
+### Assignment Overview:
+The purpose of this assignment was to get a deeper understanding of underlying network protocols and 
+explore and learn to use programming language based abstractions for implementing these
+protocols. Implementing a single threaded server helps to understand the technical nuances 
+associated with UDP packets handling, packet losses and malformed request. The assignment helped
+focus on the technical differences in the implementations of TCP and UDP protocols, error handling 
+logging mechanisms, which help in troubleshooting any application level issues by writing logs in
+human-readable formats. 
+
+### Rationale for supporting protocols and Newer Operations:
+
+TCP protocol being connection oriented makes it easy for application programming, in
+the sense, as a programmer I don't have to bother about handling sessions, managing connections, 
+account for missing packages, etc. as this is already being taken care of. Thus, implementation wise,
+TCP based client-server interaction is relatively straightforward. Although proper error handling, 
+timeout mechanism using socket operations were needed to be implemented for robust communication 
+between TCP based client and server.
+
+Handling state-altering operations like DELETE ALL and GET ALL were relatively easier to implement
+as there was no need to check any packet losses during transmission or reliability of network 
+communication. In addition, TCP does support transmission of arbitrarily large streams of data, hence
+it is much more straightforward. For supporting large streams, in case of network transmission failures,
+there are sufficient safeguards and error logging.
+
+UDP protocol on the other hand, involves a lot of stuff like handling and reporting missing packets, 
+out of order delivery and malformed packets. There is a mechanism for determining the packet ordering, 
+by using checksums. Packet data is used, along with a random uuid for generating unique checksums for 
+any types of requests to generate the request id. This request ID is then used to verify the packet ordering
+and sequencing.
+
+For GET ALL, especially when transmitting large set of data, I initially considered splitting the 
+data into chunks and sending them as separate datagram packets holding a few number of key value 
+pairs, However, I wanted to avoid the associated pitfalls of splitting incorrectly some packets at 
+the partition of packets. I considered sending each key value pair as a response to the client. 
+This ensures upto 70000 key value entries being transmitted without any packet losses and minimal integrity issues. 
+The amount of packets that are supposed to arrive from the server and the actual number of packets(key value pairs) 
+are logged on the client side on console. Deletion operation results in the clearing of data store, 
+operation agnostic.
+
+Identifying any packet losses first and then logging them was a challenge. In addition, buffers 
+had to be carefully utilized in order to avoid any potential issues with improper usage.
+
+### Practical Applications:
+One use case of such a single threaded server client application could be a “web server” which can be used to handle
+HTTP requests. One application where such a web server can be used is a “financial trading systems” where there is
+one server to handle the trade and market data requests of clients to ensure timely and accurate transactions.
+
+### Technical impressions.
+
 
 While carrying out this project, we faced multiple challenges, for example, while implementing timeout, earlier we
 tried implementing a thread for each request, but later we realized that java provides “setSoConnect” functionality 
@@ -77,9 +119,7 @@ each log and message in a text file. We maintained a list of negative edge cases
 package etc. and made sure our client and server are robust to all major failures. Finally, we also made sure while
 implementing, we modularized and documented the code to make it readable and extendable.
 
-One use case of such a single threaded server client application could be a “web server” which can be used to handle
-HTTP requests. One application where such a web server can be used is a “financial trading systems” where there is 
-one server to handle the trade and market data requests of clients to ensure timely and accurate transactions.
+
 
 
 

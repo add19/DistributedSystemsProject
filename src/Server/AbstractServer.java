@@ -8,7 +8,7 @@ import java.util.Date;
  * for any type of server.
  */
 public abstract class AbstractServer implements IServer {
-  private static final IKeyValueStore keyValueStore = new KeyValueStore();
+  private static final IDataStore keyValueStore = new DataStore();
 
   public String[] parseRequest(String inputLine) {
     String[] tokens = inputLine.split("::");
