@@ -8,7 +8,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * This represents a TCP based server which listens at a given port number for TCP client requests.
+ * This represents a TCP server which communicates to any TCP client while listening to a given port
+ * number for client requests. This class extends the abstract server class which supports all the
+ * protocol agnostic operations.
  */
 public class TCPServer extends AbstractServer {
 

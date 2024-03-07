@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * Abstract class that implements common functionalities like processing key value store read/write
- * for any type of server.
+ * for any type of server and also supports additional functionality for logging timestamps.
  */
 public abstract class AbstractServer implements IServer {
   private static final IDataStore keyValueStore = new DataStore();

@@ -104,7 +104,7 @@ public class TCPClient extends AbstractClient {
             // PUT requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
                 String key = Integer.toString(i);
-                String value = Integer.toString(i * 10);
+                String value = Integer.toString(i);
                 String putString = generateUUID() + "::PUT::key" + key + "::value" + value;
                 sendRequest(out, in, putString);
             }
