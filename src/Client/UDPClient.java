@@ -115,7 +115,7 @@ public class UDPClient extends AbstractClient {
 
   private void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
     throws IOException {
-    final int NUM_KEYS = 45000;
+    final int NUM_KEYS = 5000;
     //Pre-populating key value store
     // Send PUT requests
     for (int i = 1; i <= NUM_KEYS * 2; i++) {

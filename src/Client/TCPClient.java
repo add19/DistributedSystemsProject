@@ -99,7 +99,7 @@ public class TCPClient extends AbstractClient {
     }
 
     private void populateKeyValues(BufferedReader in, PrintWriter out) {
-        final int NUM_KEYS = 45000;
+        final int NUM_KEYS = 5000;
         try {
             // PUT requests
             for (int i = 1; i <= NUM_KEYS*2; i++) {
