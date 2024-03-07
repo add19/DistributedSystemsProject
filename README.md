@@ -78,7 +78,7 @@ For GET ALL, especially when transmitting large set of data, I initially conside
 data into chunks and sending them as separate datagram packets holding a few number of key value 
 pairs, However, I wanted to avoid the associated pitfalls of splitting incorrectly some data chunks at 
 the partition of packets. I then considered sending each key value pair as a response to the client. 
-This ensures upto 70000 key value entries being transmitted without any packet losses and minimal integrity issues. 
+This ensures arbitrarily any number of key value entries being transmitted without any packet losses and minimal integrity issues. 
 The amount of packets that are supposed to arrive from the server and the actual number of packets(key value pairs) 
 are logged on the client side on console. Delete all operation results in the clearing of data store.
 The data store returns appropriate response when it is empty so that server sends adequate response.
