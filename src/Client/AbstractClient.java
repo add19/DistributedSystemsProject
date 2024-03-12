@@ -14,7 +14,7 @@ import java.util.zip.Checksum;
  */
 public abstract class AbstractClient implements IClient {
 
-  private void displayUserChoices() {
+  protected void displayUserChoices() {
     System.out.println("Specify operation:");
     System.out.println("Input [1] -> PUT");
     System.out.println("Input [2] -> GET");
@@ -65,12 +65,12 @@ public abstract class AbstractClient implements IClient {
     return request;
   }
 
-  private String getKey(BufferedReader userInput) throws IOException {
+  protected String getKey(BufferedReader userInput) throws IOException {
     System.out.print("Please enter the key: ");
     return userInput.readLine();
   }
 
-  private String getValue(BufferedReader userInput) throws IOException {
+  protected String getValue(BufferedReader userInput) throws IOException {
     System.out.print("Please enter the value for the key: ");
     return userInput.readLine();
   }
