@@ -2,6 +2,7 @@ package RMIClient;
 
 import Client.AbstractClient;
 import RMIServer.IRemoteDataStore;
+import RMIServer.RemoteDataStore;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +10,8 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class ClientWorker extends AbstractClient {
 
@@ -61,10 +64,10 @@ public class ClientWorker extends AbstractClient {
   @Override
   public void startClient(String serverIp, int portNum) {
     IRemoteDataStore remoteObj = null;
-    try (BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
 
-      remoteObj = (IRemoteDataStore) Naming.lookup("rmi://localhost:" + portNum +
-        "/remoteserver");
+    try (BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
+      Registry registry = LocateRegistry.getRegistry("localhost", portNum);
+      remoteObj = (IRemoteDataStore) registry.lookup("kvstore");
       populateKeyValue(remoteObj);
 
       while(true) {

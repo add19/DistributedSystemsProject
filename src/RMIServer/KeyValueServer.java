@@ -1,9 +1,12 @@
 package RMIServer;
 
 import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 public class KeyValueServer {
 
@@ -15,11 +18,12 @@ public class KeyValueServer {
 
     int portNo = Integer.parseInt(args[0]);
     try {
-      IRemoteDataStore ds = new RemoteDataStore();
-      LocateRegistry.createRegistry(portNo);
-      Naming.rebind("rmi://localhost:" + portNo +
-        "/remoteserver",ds);
-    } catch (RemoteException | MalformedURLException e) {
+      RemoteDataStore obj = new RemoteDataStore();
+      IRemoteDataStore stub = (IRemoteDataStore) UnicastRemoteObject.exportObject(obj, 0);
+      Registry registry = LocateRegistry.createRegistry(portNo);
+
+      registry.rebind("kvstore", stub);
+    } catch (RemoteException e) {
       throw new RuntimeException(e);
     }
   }

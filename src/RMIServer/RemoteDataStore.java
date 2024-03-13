@@ -5,7 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RemoteDataStore extends UnicastRemoteObject implements IRemoteDataStore {
+public class RemoteDataStore implements IRemoteDataStore {
   private final ConcurrentMap<String, String> kvStore;
   protected RemoteDataStore() throws RemoteException {
     super();
