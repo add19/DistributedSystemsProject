@@ -13,10 +13,6 @@ public class KeyValueClient {
     AbstractClient abstractClient = new ClientWorker();
     int portNo = Integer.parseInt(args[1]);
 
-    try {
-      abstractClient.startClient(args[0], portNo);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    abstractClient.startClient(args[0], portNo);
   }
 }

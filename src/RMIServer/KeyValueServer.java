@@ -20,8 +20,9 @@ public class KeyValueServer {
       Registry registry = LocateRegistry.createRegistry(portNo);
 
       registry.rebind("kvstore", stub);
+      System.out.println("Server ready..");
     } catch (RemoteException e) {
-      throw new RuntimeException(e);
+      System.out.println("Server shutting down...");
     }
   }
 }

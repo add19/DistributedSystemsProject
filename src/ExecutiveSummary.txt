@@ -1,53 +1,32 @@
 ## Executive Summary
 
-### Assignment Overview:
+### Assignment Overview:(Purpose and Scope)
 
-The purpose of this assignment was to get a deeper understanding of underlying network protocols and
-explore and learn to use programming language based abstractions for implementing these
-protocols. Implementing a single threaded server helped to focus on and understand the technical nuances
-associated with UDP packet handling, packet losses and malformed request. The assignment helped
-focus on the technical differences in the implementations of TCP and UDP protocols, error handling
-logging mechanisms, which help in troubleshooting any application level issues by writing logs in
-human-readable formats.
+The purpose of this assignment was to go on to the next level of understanding client-server network communication, using Remote Procedural Calls. This is a level above the traditional
+client-server communication using lower-level network protocols like TCP or UDP. Making use of the
+RPC paradigms simplify a lot of client-server communication constructs like socket creation, socket
+management, and packet level management of data transmission. The simplicity of RPC constructs helped reduce
+the complexity of the task of making client-server communication robust in addition to making the server
+capable of handling multiple client requests.
+Using RMI facilitates remote communication by allowing us to create a publicly accessible remote server
+object. Using RMI helps minimize the difference between working with local
+and remote objects.
 
-### Technical impressions and supporting new operations:
-
-TCP protocol being connection oriented makes it easy for application programming, in
-the sense, as a programmer I don't have to bother about handling sessions, managing connections,
-account for missing packages, etc. as this is already being taken care of. Thus, implementation wise,
-TCP based client-server interaction is relatively straightforward. Although proper error handling,
-timeout mechanism using socket operations were needed to be implemented for robust communication
-between TCP based client and server.
-
-Handling state-altering operations like DELETE ALL and GET ALL were relatively easier to implement
-as there was no need to check any packet losses during transmission or reliability of network
-communication. In addition, TCP does support transmission of arbitrarily large streams of data, hence
-it is much more straightforward. For supporting large streams, in case of network transmission failures,
-there are sufficient safeguards and error logging.
-
-UDP protocol on the other hand, involves a lot of things like handling and reporting missing packets,
-out of order delivery and malformed packets. A mechanism for determining the packet ordering,
-by using checksums was implemented. Packet data is used, along with a random uuid for generating unique checksums for
-any types of requests to generate the request id. This request ID is then used to verify the packet ordering
-and sequencing. The reason to use a uuid was to avoid collisions in checksum generation in the event
-of same request being sent twice.
-
-For GET ALL, especially when transmitting large set of data, I initially considered splitting the
-data into chunks and sending them as separate datagram packets holding a few number of key value
-pairs, However, I wanted to avoid the associated pitfalls of splitting incorrectly some data chunks at
-the partition of packets. I then considered sending each key value pair as a response to the client.
-This ensures upto 70000 key value entries being transmitted without any packet losses and minimal integrity issues.
-The amount of packets that are supposed to arrive from the server and the actual number of packets(key value pairs)
-are logged on the client side on console. Delete all operation results in the clearing of data store.
-The data store returns appropriate response when it is empty so that server sends adequate response.
-
-Identifying any packet losses first and then logging them was a challenge. In addition, buffers
-had to be carefully utilized in order to avoid any potential issues with improper usage, such as
-improper sequencing, overflows or incorrect parsing.
-
-### Practical Applications:
-
-1. a “web server” which can be used to handle HTTP requests.
-2. “financial trading systems” where there is one server to handle the trade and market data requests of clients to ensure timely and accurate transactions.
-3. TCP based application can be used as a file server which handles reliable communication for sending and
-   receiving files across network. UDP based applications can be used in streaming live data transmission.
+### Technical impressions:
+Implementing RPC communication using Java RMI provided a straightforward way to achieve the
+assignment's objectives. When a client makes a request to a remote object, RMI creates a new thread
+to handle the request, facilitating multiple client requests to be handled by the server.
+The server side possesses the remote object whose methods can be called from different JVM. The stub acts as a gateway for the client side. where all the outgoing requests
+can be routed through it. It initiates communication with the remote object, marshals and writes parameters to the remote JVM.
+The skeleton on the other hand, reads parameters for remote method call,
+invoke the target methods, and marshal and return the response to the callers.
+On server, creation of remotely accessible object and registering  them with the RMI registry was implemented.
+On the client-side, performing lookup of these remote objects for communication was implemented.
+To handle race conditions, ConcurrentHashMap is used. Internally, it uses segmenting. It divides the map into segments.
+Each segment is protected by a lock. This enables multiple threads to access the map concurrently, without race.
+When a thread wants to modify a value in the map, it first acquires the lock for the segment that contains the value.
+Once the lock is acquired, the thread can safely modify the value. When the thread is finished, it releases the lock.
+Multiple calls for the same key are synchronized.
+Using synchronized methods prevents concurrent access to a block of code or object by multiple threads, preventing potential race conditions.
+This assignment helped learn more about RPC communication and concurrent programming using object oriented constructs
+with RMI and use of concurrent collections.

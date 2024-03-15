@@ -92,8 +92,12 @@ public class ClientWorker extends AbstractClient {
             System.out.println("Invalid choice. Please enter 1, 2, 3");
         }
       }
-    } catch (NotBoundException | MalformedURLException | RemoteException e) {
-      throw new RuntimeException(e);
+    } catch (RemoteException e) {
+      System.out.println("Server seems to be offline...");
+    } catch (MalformedURLException e) {
+      System.out.println("Invalid URL..." + e.getMessage());
+    } catch (NotBoundException e) {
+      System.out.println("Not bound exception..." + e.getMessage());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

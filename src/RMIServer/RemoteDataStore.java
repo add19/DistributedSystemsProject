@@ -18,13 +18,13 @@ public class RemoteDataStore implements IRemoteDataStore {
   }
 
   @Override
-  public void put(String key, String value) throws RemoteException {
+  public synchronized void put(String key, String value) throws RemoteException {
     System.out.println("[" + getTimestamp() + "] => Received PUT for key - " + key + " value - " + value);
     kvStore.put(key, value);
   }
 
   @Override
-  public String get(String key) throws RemoteException {
+  public synchronized String get(String key) throws RemoteException {
     System.out.println("[" + getTimestamp() + "] => Received GET for key - " + key);
     if(!kvStore.containsKey(key)) {
       return "Key " + key + " doesn't exist in the store";
@@ -33,7 +33,7 @@ public class RemoteDataStore implements IRemoteDataStore {
   }
 
   @Override
-  public String delete(String key) throws RemoteException {
+  public synchronized String delete(String key) throws RemoteException {
     System.out.println("[" + getTimestamp() + "] => Received DELETE for key - " + key);
 
     if(kvStore.containsKey(key)) {
