@@ -24,7 +24,7 @@ public class RemoteDataStore implements IRemoteDataStore {
   }
 
   @Override
-  public synchronized String get(String key) throws RemoteException {
+  public String get(String key) throws RemoteException {
     System.out.println("[" + getTimestamp() + "] => Received GET for key - " + key);
     if(!kvStore.containsKey(key)) {
       return "Key " + key + " doesn't exist in the store";
