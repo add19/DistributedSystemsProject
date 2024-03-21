@@ -66,7 +66,20 @@ public class ClientWorker extends AbstractClient {
     try (BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
       Registry registry = LocateRegistry.getRegistry("localhost", portNum);
       remoteObj = (IRemoteDataStore) registry.lookup("kvstore");
-      populateKeyValue(remoteObj);
+
+
+      System.out.println("Do you want to automatically pre-populate data to the key value store? (y/n)");
+      while(true) {
+        String prepopulateChoice = userInput.readLine();
+        if(prepopulateChoice.equalsIgnoreCase("y")) {
+          populateKeyValue(remoteObj);
+          break;
+        } else if(prepopulateChoice.equalsIgnoreCase("n")) {
+          break;
+        } else {
+          System.out.println("Enter Y for yes or N for no");
+        }
+      }
 
       while(true) {
         displayUserChoices();
